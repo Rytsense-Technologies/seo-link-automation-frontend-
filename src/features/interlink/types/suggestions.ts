@@ -3,6 +3,8 @@
  * Mirrors the backend schema exactly; do not add fields the backend does not return.
  */
 
+import type { PageSummary } from "./pages";
+
 export const SUGGESTION_STATUSES = ["PENDING", "APPROVED", "REJECTED", "APPLIED"] as const;
 
 export type SuggestionStatus = (typeof SUGGESTION_STATUSES)[number];
@@ -27,6 +29,19 @@ export interface Suggestion {
   created_at: string | null;
   updated_at: string | null;
   applied_at: string | null;
+}
+
+/** `GET /api/interlink/suggestions/{id}` (backend `SuggestionDetail`): a list item plus review and page details. */
+export interface SuggestionDetail extends Suggestion {
+  /** Candidate-retrieval score as returned (0-1), or null when not recorded. */
+  retrieval_score: number | null;
+  /** "deterministic" for suggestions generated without an AI call. */
+  ai_provider: string | null;
+  ai_model: string | null;
+  rejection_reason: string | null;
+  reviewed_at: string | null;
+  source_page: PageSummary;
+  target_page: PageSummary;
 }
 
 export interface SuggestionList {

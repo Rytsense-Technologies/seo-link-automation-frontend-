@@ -2,7 +2,7 @@
 
 import { useInterlinkSuggestions } from "../hooks/use-interlink-suggestions";
 import { useSuggestionFilters } from "../hooks/use-suggestion-filters";
-import { hasActiveFilters } from "../lib/url-filters";
+import { hasActiveFilters, serializeFilters, suggestionDetailHref } from "../lib/url-filters";
 import { SuggestionFiltersBar } from "./suggestion-filters";
 import { SuggestionList, SuggestionListError, SuggestionListSkeleton } from "./suggestion-list";
 
@@ -30,6 +30,7 @@ export function InterlinkPage() {
         data={suggestions.data}
         isUpdating={isUpdating}
         filtersActive={filtersActive}
+        detailHref={(suggestionId) => suggestionDetailHref(suggestionId, serializeFilters(filters))}
         onClearFilters={resetFilters}
         onPageChange={(page) => setFilters({ page })}
         onPageSizeChange={(pageSize) => setFilters({ page_size: pageSize })}

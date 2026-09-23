@@ -4,8 +4,11 @@ import {
   DEFAULT_FILTERS,
   applyFilterPatch,
   hasActiveFilters,
+  isUuid,
   parseFilters,
   serializeFilters,
+  suggestionDetailHref,
+  suggestionListHref,
   type SuggestionFilters,
 } from "./url-filters";
 
@@ -94,5 +97,23 @@ describe("hasActiveFilters", () => {
     expect(hasActiveFilters({ ...DEFAULT_FILTERS, page: 5, page_size: 100 })).toBe(false);
     expect(hasActiveFilters({ ...DEFAULT_FILTERS, min_relevance_score: 0 })).toBe(true);
     expect(hasActiveFilters({ ...DEFAULT_FILTERS, status: "PENDING" })).toBe(true);
+  });
+});
+
+describe("detail and list hrefs", () => {
+  it("builds the detail route, keeping the list query for the way back", () => {
+    expect(suggestionDetailHref(PAGE_1, "")).toBe(`/interlink/${PAGE_1}`);
+    expect(suggestionDetailHref(PAGE_1, "status=PENDING&page=2")).toBe(`/interlink/${PAGE_1}?status=PENDING&page=2`);
+  });
+
+  it("builds the list route from filters", () => {
+    expect(suggestionListHref(DEFAULT_FILTERS)).toBe("/interlink");
+    expect(suggestionListHref({ ...DEFAULT_FILTERS, status: "REJECTED", page: 3 })).toBe("/interlink?status=REJECTED&page=3");
+  });
+
+  it("recognises UUIDs", () => {
+    expect(isUuid(PAGE_1)).toBe(true);
+    expect(isUuid("not-a-uuid")).toBe(false);
+    expect(isUuid(null)).toBe(false);
   });
 });

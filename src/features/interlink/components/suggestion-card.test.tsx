@@ -80,4 +80,28 @@ describe("SuggestionCard", () => {
     render(<SuggestionCard suggestion={makeSuggestion({ status: "APPLIED", applied_at: "2026-09-23T09:00:00Z" })} />);
     expect(screen.getByText("Applied", { selector: "dt" })).toBeInTheDocument();
   });
+
+  it("links the card to the suggestion's detail page without nesting interactive elements", () => {
+    const suggestion = makeSuggestion();
+    render(<SuggestionCard suggestion={suggestion} href={`/interlink/${suggestion.id}?status=PENDING`} />);
+
+    const detail = screen.getByRole("link", { name: suggestion.anchor_text });
+    expect(detail).toHaveAttribute("href", `/interlink/${suggestion.id}?status=PENDING`);
+    expect(detail).not.toHaveAttribute("target");
+    expect(detail.closest("h3")).not.toBeNull();
+
+    const target = screen.getByRole("link", { name: /opens in a new tab/ });
+    expect(target).toHaveAttribute("href", suggestion.target_url);
+    expect(target).toHaveAttribute("target", "_blank");
+    for (const element of screen.getAllByRole("link")) {
+      expect(element.querySelector("a, button")).toBeNull();
+      expect(element.parentElement?.closest("a, button")).toBeNull();
+    }
+  });
+
+  it("defaults the detail link to the bare detail route", () => {
+    const suggestion = makeSuggestion();
+    render(<SuggestionCard suggestion={suggestion} />);
+    expect(screen.getByRole("link", { name: suggestion.anchor_text })).toHaveAttribute("href", `/interlink/${suggestion.id}`);
+  });
 });

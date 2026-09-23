@@ -1,7 +1,7 @@
 import { vi } from "vitest";
-import type { PageList, PageRead } from "../types/pages";
+import type { PageList, PageRead, PageSummary } from "../types/pages";
 import type { Site } from "../types/sites";
-import type { Suggestion, SuggestionList } from "../types/suggestions";
+import type { Suggestion, SuggestionDetail, SuggestionList } from "../types/suggestions";
 
 /** Test-only fixtures shaped exactly like the backend contracts. Never imported by app code. */
 
@@ -41,6 +41,35 @@ export function makeSuggestion(overrides: Partial<Suggestion> = {}): Suggestion 
     created_at: "2026-09-22T14:11:04Z",
     updated_at: "2026-09-22T14:11:04Z",
     applied_at: null,
+    ...overrides,
+  };
+}
+
+export const SOURCE_PAGE: PageSummary = {
+  id: PAGE_1,
+  url: "https://example.test/healthcare-chatbots/",
+  title: "Healthcare Chatbots | Example",
+  h1: "Healthcare Chatbots",
+};
+
+export const TARGET_PAGE: PageSummary = {
+  id: PAGE_2,
+  url: "https://example.test/services/patient-engagement/",
+  title: "Patient Engagement Services",
+  h1: "Patient Engagement",
+};
+
+/** A deterministic (non-AI), unreviewed suggestion, as the detail endpoint returns it. */
+export function makeSuggestionDetail(overrides: Partial<SuggestionDetail> = {}): SuggestionDetail {
+  return {
+    ...makeSuggestion(),
+    retrieval_score: 0.5487,
+    ai_provider: "deterministic",
+    ai_model: null,
+    rejection_reason: null,
+    reviewed_at: null,
+    source_page: SOURCE_PAGE,
+    target_page: TARGET_PAGE,
     ...overrides,
   };
 }

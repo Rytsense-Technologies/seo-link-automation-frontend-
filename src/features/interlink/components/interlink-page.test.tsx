@@ -91,6 +91,14 @@ describe("InterlinkPage", () => {
     expect(new Set(paths)).toEqual(new Set(["/api/backend/sites", "/api/backend/interlink/suggestions"]));
   });
 
+  it("links each card to its detail page, carrying the current filters", async () => {
+    setTestUrl(`/interlink?status=PENDING&site_id=${SITE_A}&page=2`);
+    backend();
+    renderPage();
+    const card = await screen.findByRole("link", { name: "anchor for PENDING" });
+    expect(card).toHaveAttribute("href", `/interlink/${makeSuggestion().id}?status=PENDING&site_id=${SITE_A}&page=2`);
+  });
+
   it("does not load any site pages until a site is chosen", async () => {
     const api = backend();
     renderPage();

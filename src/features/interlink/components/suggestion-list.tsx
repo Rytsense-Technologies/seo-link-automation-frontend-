@@ -33,11 +33,21 @@ export function SuggestionListSkeleton({ count = 3 }: { count?: number }) {
   );
 }
 
-export function SuggestionListError({ error, onRetry, retrying }: { error: unknown; onRetry: () => void; retrying: boolean }) {
-  const message = error instanceof Error ? error.message : "The suggestions could not be loaded.";
+export function SuggestionListError({
+  error,
+  onRetry,
+  retrying,
+  title = "Could not load suggestions",
+}: {
+  error: unknown;
+  onRetry: () => void;
+  retrying: boolean;
+  title?: string;
+}) {
+  const message = error instanceof Error ? error.message : "The request could not be completed.";
   return (
     <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950/40">
-      <h3 className="text-sm font-semibold text-red-900 dark:text-red-200">Could not load suggestions</h3>
+      <h3 className="text-sm font-semibold text-red-900 dark:text-red-200">{title}</h3>
       <p className="mt-1 text-sm text-red-800 dark:text-red-300">{message}</p>
       {isApiError(error) && (
         <p className="mt-1 font-mono text-xs text-red-700 dark:text-red-400">
@@ -56,6 +66,8 @@ export interface SuggestionListProps {
   /** Showing the previous result while the next filter/page loads. */
   isUpdating: boolean;
   filtersActive: boolean;
+  /** Detail-page URL for a suggestion; carries the list filters so "back" restores them. */
+  detailHref: (suggestionId: string) => string;
   onClearFilters: () => void;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
@@ -65,6 +77,7 @@ export function SuggestionList({
   data,
   isUpdating,
   filtersActive,
+  detailHref,
   onClearFilters,
   onPageChange,
   onPageSizeChange,
@@ -108,7 +121,7 @@ export function SuggestionList({
       >
         {data.items.map((suggestion) => (
           <li key={suggestion.id}>
-            <SuggestionCard suggestion={suggestion} />
+            <SuggestionCard suggestion={suggestion} href={detailHref(suggestion.id)} />
           </li>
         ))}
       </ul>

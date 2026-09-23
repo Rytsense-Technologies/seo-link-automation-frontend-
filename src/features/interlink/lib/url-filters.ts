@@ -25,8 +25,12 @@ export const DEFAULT_FILTERS: SuggestionFilters = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export function isUuid(value: string | null | undefined): value is string {
+  return typeof value === "string" && UUID_PATTERN.test(value);
+}
+
 function parseUuid(value: string | null): string | null {
-  return value && UUID_PATTERN.test(value) ? value : null;
+  return isUuid(value) ? value : null;
 }
 
 function parseInteger(value: string | null): number | null {
@@ -91,4 +95,21 @@ export function hasActiveFilters(filters: SuggestionFilters): boolean {
     filters.source_page_id !== null ||
     filters.min_relevance_score !== null
   );
+}
+
+export const LIST_PATH = "/interlink";
+
+/** The list URL for a set of filters (the "Back to suggestions" target). */
+export function suggestionListHref(filters: SuggestionFilters): string {
+  const query = serializeFilters(filters);
+  return query ? `${LIST_PATH}?${query}` : LIST_PATH;
+}
+
+/**
+ * The detail URL. The list's query string rides along, so the detail page can link back to the
+ * same filtered list; it is re-parsed there, never trusted as-is.
+ */
+export function suggestionDetailHref(suggestionId: string, listQuery: string): string {
+  const path = `${LIST_PATH}/${encodeURIComponent(suggestionId)}`;
+  return listQuery ? `${path}?${listQuery}` : path;
 }
