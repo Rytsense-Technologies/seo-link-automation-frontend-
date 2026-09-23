@@ -82,19 +82,27 @@ export function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
 
-type Handler = (query: URLSearchParams) => Response | Promise<Response>;
+/** What a stub handler sees of the request besides its query string. */
+export interface StubRequest {
+  method: string;
+  /** Parsed JSON body; undefined when the request had none. */
+  body: unknown;
+}
+
+type Handler = (query: URLSearchParams, request: StubRequest) => Response | Promise<Response>;
 
 /**
  * A fetch stub that routes proxy requests by path (e.g. "interlink/suggestions") and records
- * every call, so tests can assert on the exact query the UI sent.
+ * every call, so tests can assert on the exact query, method and body the UI sent.
  */
 export function stubBackend(routes: Record<string, Handler>) {
-  const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+  const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input), "http://localhost");
     const path = url.pathname.replace(/^\/api\/backend\//, "");
     const handler = routes[path];
     if (!handler) return jsonResponse(404, { error: { code: "NOT_FOUND", message: `No stub for ${path}` } });
-    return handler(url.searchParams);
+    const body = typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : undefined;
+    return handler(url.searchParams, { method: init?.method ?? "GET", body });
   });
   vi.stubGlobal("fetch", fetchMock);
 
@@ -104,9 +112,16 @@ export function stubBackend(routes: Record<string, Handler>) {
       .filter((url) => url.pathname === `/api/backend/${path}`)
       .map((url) => url.searchParams);
 
+  /** Every call to `path` with its method and raw init, for mutation assertions. */
+  const calls = (path: string): { method: string; init: RequestInit | undefined }[] =>
+    fetchMock.mock.calls
+      .filter(([input]) => new URL(String(input), "http://localhost").pathname === `/api/backend/${path}`)
+      .map(([, init]) => ({ method: init?.method ?? "GET", init }));
+
   return {
     fetchMock,
     requests,
+    calls,
     lastRequest: (path: string): URLSearchParams | undefined => requests(path).at(-1),
   };
 }

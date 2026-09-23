@@ -48,6 +48,9 @@ export function Mono({ children }: { children: ReactNode }) {
   return <span className="font-mono text-xs break-all text-slate-700 dark:text-slate-300">{children}</span>;
 }
 
+export const PANEL_CLASS =
+  "rounded-lg border border-slate-200 bg-white p-4 shadow-xs sm:p-5 dark:border-slate-800 dark:bg-slate-900";
+
 export const LINK_CLASS =
   "rounded text-blue-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-300";
 

@@ -9,11 +9,10 @@ import type { PageSummary } from "../types/pages";
 import type { SuggestionDetail as SuggestionDetailData } from "../types/suggestions";
 import { BUTTON_CLASS } from "./pagination";
 import { RelevanceScore } from "./relevance-score";
-import { DateValue, ExternalLink, Field, LINK_CLASS, highlightAnchor } from "./suggestion-fields";
+import { DateValue, ExternalLink, Field, LINK_CLASS, PANEL_CLASS, highlightAnchor } from "./suggestion-fields";
 import { SuggestionListError } from "./suggestion-list";
+import { SuggestionReviewActions } from "./suggestion-review-actions";
 import { SuggestionStatusBadge } from "./suggestion-status-badge";
-
-const PANEL_CLASS = "rounded-lg border border-slate-200 bg-white p-4 shadow-xs sm:p-5 dark:border-slate-800 dark:bg-slate-900";
 
 /** A missing value: a dash on screen, a word for screen readers. */
 function EmptyValue({ label = "None" }: { label?: string }) {
@@ -101,6 +100,8 @@ export function SuggestionDetailView({ suggestion }: { suggestion: SuggestionDet
           </dl>
         </Section>
       </div>
+
+      <SuggestionReviewActions suggestion={suggestion} />
 
       {suggestion.rejection_reason !== null && (
         <Section title="Rejection reason" className="border-red-200 dark:border-red-900">
