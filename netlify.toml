@@ -1,0 +1,10 @@
+# Netlify build settings. Netlify's Next.js adapter (OpenNext) is applied automatically: pages and
+# the /api/backend proxy run as serverless functions, src/proxy.js (the password gate) as an edge
+# handler. Build on Netlify (Linux); `netlify build` on Windows fails in the adapter's file steps.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Next.js 16 needs Node 20.9+.
+  NODE_VERSION = "22"

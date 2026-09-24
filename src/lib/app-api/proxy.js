@@ -23,11 +23,15 @@ const jsonResponse = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
 /**
- * `options.timeoutMs` aborts the backend call after that many ms. Analyze runs can be slow, so the
- * default is generous.
+ * The default backend timeout: generous (analysis and single-page crawls can be slow) but under
+ * the 60 s limit hosting platforms such as Netlify put on server functions, so a slow backend
+ * yields the normal BACKEND_UNAVAILABLE envelope instead of the platform killing the request.
  */
+export const DEFAULT_BACKEND_TIMEOUT_MS = 55_000;
+
+/** `options.timeoutMs` aborts the backend call after that many ms. */
 export async function proxyToBackend(request, path, options = {}) {
-  const { timeoutMs = 120_000 } = options;
+  const { timeoutMs = DEFAULT_BACKEND_TIMEOUT_MS } = options;
 
   let config;
   try {

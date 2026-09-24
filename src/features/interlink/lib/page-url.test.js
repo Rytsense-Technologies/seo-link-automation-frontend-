@@ -14,7 +14,7 @@ describe("validatePageUrl", () => {
     expect(validatePageUrl("   ")).toEqual({ error: EMPTY_URL_MESSAGE });
     expect(validatePageUrl(undefined)).toEqual({ error: EMPTY_URL_MESSAGE });
   });
-
+                      
   it.each([
     "rytsensetech.com/page/",
     "/ai-chatbot-development-services/",
